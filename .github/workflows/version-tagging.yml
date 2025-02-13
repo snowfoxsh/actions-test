@@ -46,7 +46,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git commit --allow-empty -m "trigger workflow $VERSION"
           git tag -a "$VERSION" -m "Release $VERSION" HEAD
-          git push origin main "$VERSION"  # Ensure tags are pushed
+          git push --tags
           echo "tag_created=true" >> $GITHUB_ENV
 
 
