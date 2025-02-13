@@ -3,7 +3,7 @@ name = "aplang"
 version = "0.1.7"
 edition = "2021"
 authors = ["Patrick Unick", "Eli Fischl"]
-description = "A programming language made to aid students who are taking AP Computer Science Principals."
+description = "Edit this to something: ITER = 0"
 documentation = "https://aplang.org/book/"
 readme = "README.md"
 homepage = "https://aplang.org/"
