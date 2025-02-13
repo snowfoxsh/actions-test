@@ -44,9 +44,9 @@ jobs:
           VERSION=v${{ steps.get_version.outputs.value }}
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git commit --allow-empty -m "trigger workflow $VERSION"
-          git tag -a "$VERSION" -m "Release $VERSION" HEAD
-          git push --tags
+          echo git commit --allow-empty -m "trigger workflow $VERSION"
+          git tag "$VERSION"
+          git push origin main --tags
           echo "tag_created=true" >> $GITHUB_ENV
 
 
