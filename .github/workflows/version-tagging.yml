@@ -39,14 +39,15 @@ jobs:
 
       - name: Create and Push Git Tag
         id: create_tag
-        if: env.TAG_EXISTS == 'false'  # Run only if the tag doesn't exist
+        if: env.TAG_EXISTS == 'false'
         run: |
           VERSION=v${{ steps.get_version.outputs.value }}
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "$VERSION" -m "Release $VERSION"
-          git push origin "$VERSION"
+          git push --follow-tags origin "$VERSION"  # Ensure tags are pushed
           echo "tag_created=true" >> $GITHUB_ENV
+
 
       - name: Print Confirmation
         run: |
