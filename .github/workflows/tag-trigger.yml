@@ -1,0 +1,15 @@
+name: Tag Triggered Workflow
+
+on:
+  push:
+    tags:
+      - "v*"  # Runs only when a tag starting with "v" is created
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Hello World
+        run: |
+          echo "Hello, World! A new tag was created: ${{ github.ref }}"
+  
