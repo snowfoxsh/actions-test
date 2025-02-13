@@ -1,0 +1,59 @@
+[package]
+name = "aplang"
+version = "0.1.7"
+edition = "2021"
+authors = ["Patrick Unick", "Eli Fischl"]
+description = "A programming language made to aid students who are taking AP Computer Science Principals."
+documentation = "https://aplang.org/book/"
+readme = "README.md"
+homepage = "https://aplang.org/"
+license = "GPL-3.0-or-later"
+keywords = ["aplang", "ap", "programming", "language", "apcsp"]
+categories = ["compilers", "wasm"]
+repository = "https://github.com/snowfoxsh/aplang"
+default-run = "aplang"
+
+# see more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+lto = true
+opt-level = 3
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+cfg-if = "1.0.0"
+mapro = "0.1.1"
+owo-colors = "4.1.0"
+thiserror = "2.0.11"
+clap = { version = "4.5.18", features = ["derive"] }
+rand = "0.9.0-alpha.2"
+
+# dependencies based on features
+
+miette = { version = "7.2.0", optional = true } # both
+
+stacker = { version = "0.1.17", optional = true } # native
+
+getrandom = { version = "0.2.15", optional = true } # wasm
+wasm-bindgen = { version = "0.2.93", optional = true } # wasm
+js-sys = { version = "0.3.70", optional = true } # wasm
+
+
+
+[features]
+# "native" feature for non-wasm platforms, enabling native dependencies
+native = ["miette/fancy", "stacker"]
+
+# "portable" allows for fully static linking at the cost of low stack size
+# cargo build --no-default-features --features portable
+portable = ["miette/fancy-no-syscall"]
+
+
+# YOU SHALL NOT RUN AS A BINARY WITH THE WASM FEATURE!
+# "wasm" feature, enabling wasm-specific dependencies
+# cargo build --no-default-features --features wasm
+wasm = ["miette/fancy-no-syscall", "getrandom/js", "wasm-bindgen", "js-sys"]
+
+# default is empty, so you can explicitly opt-in to "wasm"
+default = ["native"]
