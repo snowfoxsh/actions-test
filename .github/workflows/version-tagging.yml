@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.get_version.outputs.value }}  # Pass version to next job
-      tag_created: ${{ steps.create_tag.outputs.tag_created }}  # Pass if tag was created
+      tag_created: ${{ steps.tag_create.outputs.tagname }}  # Pass if tag was created
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -31,6 +31,7 @@ jobs:
         id: check_tag
         run: |
           VERSION=v${{ steps.get_version.outputs.value }}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           if git rev-parse "$VERSION" >/dev/null 2>&1; then
             echo "TAG_EXISTS=true" >> $GITHUB_ENV
           else
@@ -40,30 +41,87 @@ jobs:
       - name: Create and Push Git Tag
         if: env.TAG_EXISTS == 'false'
         uses: rickstaa/action-create-tag@v1
-        id: "tag_create"
+        id: tag_create
         with:
-          tag: env.VERSION
+          tag: ${{ env.VERSION }}  # Correct way to pass environment variable
           tag_exists_error: false
           message: "Latest release"
-
-      #   id: create_tag
-      #   if: env.TAG_EXISTS == 'false'
-      #   run: |
-      #     VERSION=v${{ steps.get_version.outputs.value }}
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #     git tag "$VERSION"
-      #     git push origin main --tags
-      #     echo "tag_created=true" >> $GITHUB_ENV
-
 
       - name: Print Confirmation
         run: |
           if [ "${{ env.TAG_EXISTS }}" == "true" ]; then
-            echo "✅ Tag already exists: v${{ steps.get_version.outputs.value }}"
+            echo "✅ Tag already exists: ${{ env.VERSION }}"
           else
-            echo "🚀 New tag created: v${{ steps.get_version.outputs.value }}"
+            echo "🚀 New tag created: ${{ env.VERSION }}"
           fi
+
+
+# name: Auto Version Tagging
+
+# on:
+#   push:
+#     branches:
+#       - main  # Adjust if needed
+
+# permissions:
+#   contents: write  # Required to push new tags
+
+# jobs:
+#   tag-version:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       new_version: ${{ steps.get_version.outputs.value }}  # Pass version to next job
+#       tag_created: ${{ steps.create_tag.outputs.tag_created }}  # Pass if tag was created
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0  # Fetch all history to compare versions
+
+#       - name: Extract Version from Cargo.toml
+#         id: get_version
+#         uses: sravinet/toml-select@v1.0.1
+#         with:
+#           file: "Cargo.toml"
+#           field: "package.version"
+
+#       - name: Check if Tag Exists
+#         id: check_tag
+#         run: |
+#           VERSION=v${{ steps.get_version.outputs.value }}
+#           if git rev-parse "$VERSION" >/dev/null 2>&1; then
+#             echo "TAG_EXISTS=true" >> $GITHUB_ENV
+#           else
+#             echo "TAG_EXISTS=false" >> $GITHUB_ENV
+#           fi
+    
+#       - name: Create and Push Git Tag
+#         if: env.TAG_EXISTS == 'false'
+#         uses: rickstaa/action-create-tag@v1
+#         id: "tag_create"
+#         with:
+#           tag: env.VERSION
+#           tag_exists_error: false
+#           message: "Latest release"
+
+#       #   id: create_tag
+#       #   if: env.TAG_EXISTS == 'false'
+#       #   run: |
+#       #     VERSION=v${{ steps.get_version.outputs.value }}
+#       #     git config --global user.name "github-actions[bot]"
+#       #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#       #     git tag "$VERSION"
+#       #     git push origin main --tags
+#       #     echo "tag_created=true" >> $GITHUB_ENV
+
+
+#       - name: Print Confirmation
+#         run: |
+#           if [ "${{ env.TAG_EXISTS }}" == "true" ]; then
+#             echo "✅ Tag already exists: v${{ steps.get_version.outputs.value }}"
+#           else
+#             echo "🚀 New tag created: v${{ steps.get_version.outputs.value }}"
+#           fi
 
   # confirm-tag:
   #   runs-on: ubuntu-latest
