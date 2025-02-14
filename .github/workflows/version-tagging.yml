@@ -36,17 +36,25 @@ jobs:
           else
             echo "TAG_EXISTS=false" >> $GITHUB_ENV
           fi
-
+    
       - name: Create and Push Git Tag
-        id: create_tag
         if: env.TAG_EXISTS == 'false'
-        run: |
-          VERSION=v${{ steps.get_version.outputs.value }}
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$VERSION"
-          git push origin main --tags
-          echo "tag_created=true" >> $GITHUB_ENV
+        uses: rickstaa/action-create-tag@v1
+        id: "tag_create"
+        with:
+          tag: ${{ env.VERSION }}
+          tag_exists_error: false
+          message: "Latest release"
+
+      #   id: create_tag
+      #   if: env.TAG_EXISTS == 'false'
+      #   run: |
+      #     VERSION=v${{ steps.get_version.outputs.value }}
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git tag "$VERSION"
+      #     git push origin main --tags
+      #     echo "tag_created=true" >> $GITHUB_ENV
 
 
       - name: Print Confirmation
